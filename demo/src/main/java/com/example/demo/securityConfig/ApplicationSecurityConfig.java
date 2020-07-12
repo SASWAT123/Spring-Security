@@ -20,7 +20,8 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests()
+		http.csrf().disable()
+			.authorizeRequests()
 			.antMatchers("/api/**").hasRole(ApplicationUserRole.STUDENT.name())	//Protects the api only for STUDENT roles
 			.anyRequest()
 			.authenticated()
@@ -33,17 +34,23 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected UserDetailsService userDetailsService() {
 		UserDetails saswatUser = User.builder()
 				.username("saswat")
-				.password(passwordEncoderConfig.passwordEncoder().encode("password1")) //Encrypting password using BCrypt encoder
+				.password(passwordEncoderConfig.passwordEncoder().encode("password")) //Encrypting password using BCrypt encoder
 				.roles(ApplicationUserRole.STUDENT.name()) //ROLE_STUDENT
 				.build();
 		
 		UserDetails adminUser = User.builder()
 				.username("admin")
 				.password(passwordEncoderConfig.passwordEncoder().encode("password123")) //Encrypting password using BCrypt encoder
-				.roles(ApplicationUserRole.ADMIN.name()) //ROLE_STUDENT
+				.roles(ApplicationUserRole.ADMIN.name()) //ROLE_ADMIN
 				.build();
 		
-		return new InMemoryUserDetailsManager(saswatUser, adminUser);
+		UserDetails adminTraineeUser = User.builder()
+				.username("admintrainee")
+				.password(passwordEncoderConfig.passwordEncoder().encode("password123")) //Encrypting password using BCrypt encoder
+				.roles(ApplicationUserRole.ADMINTRAINEE.name()) //ROLE_ADMINTRAINEE
+				.build();
+		
+		return new InMemoryUserDetailsManager(saswatUser, adminUser, adminTraineeUser);
 				
 	}
 	
